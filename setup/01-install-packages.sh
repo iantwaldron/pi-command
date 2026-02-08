@@ -19,3 +19,5 @@ fi
 
 echo "Installing networking packages..."
 sudo apt install -y hostapd dnsmasq iptables-persistent
+
+echo "Package installation complete."

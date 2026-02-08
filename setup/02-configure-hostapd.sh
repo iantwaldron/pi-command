@@ -29,3 +29,5 @@ wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP CCMP
 rsn_pairwise=CCMP
 EOF
+
+echo "hostapd configuration complete."
