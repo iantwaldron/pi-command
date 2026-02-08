@@ -14,7 +14,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Commands:
-  setup    Configure the Pi as a wireless access point
+  setup         Configure the Pi as a wireless access point
+  update-creds  Update AP SSID and/or passphrase
 """
     )
     parser.add_argument("command", nargs="?", help="Command to run")
@@ -30,6 +31,9 @@ Commands:
         if args.use_defaults:
             sys.argv.append("--use-defaults")
         setup_main()
+    elif args.command == "update-creds":
+        from update_creds import main as update_creds_main
+        update_creds_main()
     elif args.command is None:
         parser.print_help()
     else:
