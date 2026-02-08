@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+from pathlib import Path
+
+# Add cli directory to path
+CLI_DIR = Path(__file__).parent.parent / "cli"
+sys.path.insert(0, str(CLI_DIR))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Pi Command - Raspberry Pi AP management",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Commands:
+  setup    Configure the Pi as a wireless access point
+"""
+    )
+    parser.add_argument("command", nargs="?", help="Command to run")
+    parser.add_argument("--use-defaults", action="store_true",
+                        help="Use all defaults (for setup command)")
+
+    args, remaining = parser.parse_known_args()
+
+    if args.command == "setup":
+        from setup import main as setup_main
+        # Re-parse with setup's argument parser
+        sys.argv = ["pi-command setup"] + remaining
+        if args.use_defaults:
+            sys.argv.append("--use-defaults")
+        setup_main()
+    elif args.command is None:
+        parser.print_help()
+    else:
+        print(f"Unknown command: {args.command}", file=sys.stderr)
+        parser.print_help()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
