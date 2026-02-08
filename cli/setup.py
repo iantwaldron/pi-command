@@ -109,6 +109,15 @@ def setup_nat(ap_interface: str, wan_interface: str):
     run_script("05-setup-nat.sh", env=env)
 
 
+def setup_service(interface: str, gateway: str):
+    """Run 06-setup-service.sh"""
+    import os
+    env = os.environ.copy()
+    env["AP_INTERFACE"] = interface
+    env["AP_GATEWAY"] = gateway
+    run_script("06-setup-service.sh", env=env)
+
+
 def main():
     print("=== Pi Command Setup ===")
     print("(Press Enter to accept defaults shown in brackets)\n")
@@ -150,6 +159,7 @@ def main():
     configure_dnsmasq(interface, gateway)
     configure_network_manager(interface)
     setup_nat(interface, wan_interface)
+    setup_service(interface, gateway)
 
     print("\n=== Setup complete ===")
 
