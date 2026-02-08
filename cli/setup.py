@@ -92,6 +92,14 @@ def configure_dnsmasq(interface: str, gateway: str):
     run_script("03-configure-dnsmasq.sh", env=env)
 
 
+def configure_network_manager(interface: str):
+    """Run 04-configure-network-manager.sh"""
+    import os
+    env = os.environ.copy()
+    env["AP_INTERFACE"] = interface
+    run_script("04-configure-network-manager.sh", env=env)
+
+
 def main():
     print("=== Pi Command Setup ===")
     print("(Press Enter to accept defaults shown in brackets)\n")
@@ -129,6 +137,7 @@ def main():
     install_packages(chipset)
     configure_hostapd(interface, ssid, country, passphrase)
     configure_dnsmasq(interface, gateway)
+    configure_network_manager(interface)
 
     print("\n=== Setup complete ===")
 
