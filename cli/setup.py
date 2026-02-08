@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import argparse
 import subprocess
 import getpass
+import sys
 from pathlib import Path
 
 SETUP_DIR = Path(__file__).parent.parent / "setup"
@@ -132,27 +134,47 @@ def configure_mdns():
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Pi Command Setup")
+    parser.add_argument("--use-defaults", action="store_true",
+                        help="Use all defaults, read passphrase from stdin")
+    args = parser.parse_args()
+
     print("=== Pi Command Setup ===")
-    print("(Press Enter to accept defaults shown in brackets)\n")
 
-    # Gather all config via prompts
-    chipset = prompt_choice("WiFi chipset", ["intel", "realtek"], default=DEFAULTS["DEFAULT_WIFI_CHIPSET"])
-    interface = prompt("AP interface", default=DEFAULTS["DEFAULT_AP_INTERFACE"])
-    ssid = prompt("Network SSID", default=DEFAULTS["DEFAULT_AP_SSID"])
-
-    if DEFAULTS["DEFAULT_AP_COUNTRY"] == "US":
-        if prompt_yes_no("Are you in the United States?", default=True):
-            country = "US"
-        else:
-            country = prompt("Country code (e.g., GB, DE, CA)").upper()
+    if args.use_defaults:
+        # Non-interactive mode - use all defaults
+        chipset = DEFAULTS["DEFAULT_WIFI_CHIPSET"]
+        interface = DEFAULTS["DEFAULT_AP_INTERFACE"]
+        ssid = DEFAULTS["DEFAULT_AP_SSID"]
+        country = DEFAULTS["DEFAULT_AP_COUNTRY"]
+        gateway = DEFAULTS["DEFAULT_AP_GATEWAY"]
+        wan_interface = DEFAULTS["DEFAULT_WAN_INTERFACE"]
+        enable_mdns = False
+        passphrase = sys.stdin.readline().strip()
+        if not passphrase:
+            print("Error: passphrase required via stdin", file=sys.stderr)
+            sys.exit(1)
     else:
-        country = prompt("Country code", default=DEFAULTS["DEFAULT_AP_COUNTRY"]).upper()
+        # Interactive mode
+        print("(Press Enter to accept defaults shown in brackets)\n")
 
-    passphrase = getpass.getpass("AP passphrase: ")
+        chipset = prompt_choice("WiFi chipset", ["intel", "realtek"], default=DEFAULTS["DEFAULT_WIFI_CHIPSET"])
+        interface = prompt("AP interface", default=DEFAULTS["DEFAULT_AP_INTERFACE"])
+        ssid = prompt("Network SSID", default=DEFAULTS["DEFAULT_AP_SSID"])
 
-    gateway = prompt("AP gateway IP", default=DEFAULTS["DEFAULT_AP_GATEWAY"])
-    wan_interface = prompt("WAN interface (internet uplink)", default=DEFAULTS["DEFAULT_WAN_INTERFACE"])
-    enable_mdns = prompt_yes_no("Enable mDNS reflection (device discovery across networks)?", default=False)
+        if DEFAULTS["DEFAULT_AP_COUNTRY"] == "US":
+            if prompt_yes_no("Are you in the United States?", default=True):
+                country = "US"
+            else:
+                country = prompt("Country code (e.g., GB, DE, CA)").upper()
+        else:
+            country = prompt("Country code", default=DEFAULTS["DEFAULT_AP_COUNTRY"]).upper()
+
+        passphrase = getpass.getpass("AP passphrase: ")
+
+        gateway = prompt("AP gateway IP", default=DEFAULTS["DEFAULT_AP_GATEWAY"])
+        wan_interface = prompt("WAN interface (internet uplink)", default=DEFAULTS["DEFAULT_WAN_INTERFACE"])
+        enable_mdns = prompt_yes_no("Enable mDNS reflection (device discovery across networks)?", default=False)
 
     # Confirm
     print(f"\nChipset:      {chipset}")
@@ -164,7 +186,7 @@ def main():
     print(f"mDNS:         {'enabled' if enable_mdns else 'disabled'}")
     print()
 
-    if not prompt_yes_no("Proceed with setup?", default=True):
+    if not args.use_defaults and not prompt_yes_no("Proceed with setup?", default=True):
         print("Aborted.")
         return
 
