@@ -100,6 +100,15 @@ def configure_network_manager(interface: str):
     run_script("04-configure-network-manager.sh", env=env)
 
 
+def enable_ip_forwarding(ap_interface: str, wan_interface: str):
+    """Run 05-enable-ip-forwarding.sh"""
+    import os
+    env = os.environ.copy()
+    env["AP_INTERFACE"] = ap_interface
+    env["WAN_INTERFACE"] = wan_interface
+    run_script("05-enable-ip-forwarding.sh", env=env)
+
+
 def main():
     print("=== Pi Command Setup ===")
     print("(Press Enter to accept defaults shown in brackets)\n")
@@ -120,13 +129,15 @@ def main():
     passphrase = getpass.getpass("AP passphrase: ")
 
     gateway = prompt("AP gateway IP", default=DEFAULTS["DEFAULT_AP_GATEWAY"])
+    wan_interface = prompt("WAN interface (internet uplink)", default=DEFAULTS["DEFAULT_WAN_INTERFACE"])
 
     # Confirm
-    print(f"\nChipset:   {chipset}")
-    print(f"Interface: {interface}")
-    print(f"SSID:      {ssid}")
-    print(f"Country:   {country}")
-    print(f"Gateway:   {gateway}")
+    print(f"\nChipset:      {chipset}")
+    print(f"AP interface: {interface}")
+    print(f"WAN interface: {wan_interface}")
+    print(f"SSID:         {ssid}")
+    print(f"Country:      {country}")
+    print(f"Gateway:      {gateway}")
     print()
 
     if not prompt_yes_no("Proceed with setup?", default=True):
@@ -138,6 +149,7 @@ def main():
     configure_hostapd(interface, ssid, country, passphrase)
     configure_dnsmasq(interface, gateway)
     configure_network_manager(interface)
+    enable_ip_forwarding(interface, wan_interface)
 
     print("\n=== Setup complete ===")
 
