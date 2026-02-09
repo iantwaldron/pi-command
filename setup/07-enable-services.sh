@@ -12,6 +12,10 @@ sudo systemctl unmask hostapd
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
 
+# Ensure wifi radios are unblocked
+sudo rfkill unblock wifi
+sudo nmcli radio wifi on
+
 # Restart NetworkManager first
 sudo systemctl restart NetworkManager
 sleep 2
