@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import subprocess
 import getpass
 import sys
@@ -53,7 +54,6 @@ def prompt_yes_no(message: str, default: bool = True) -> bool:
 
 def install_packages(chipset: str):
     """Run 01-install-packages.sh"""
-    import os
     env = os.environ.copy()
     env["WIFI_CHIPSET"] = chipset
     run_script("01-install-packages.sh", env=env)
@@ -61,7 +61,6 @@ def install_packages(chipset: str):
 
 def configure_hostapd(interface: str, ssid: str, country: str, passphrase: str):
     """Run 02-configure-hostapd.sh"""
-    import os
     env = os.environ.copy()
     env["AP_INTERFACE"] = interface
     env["AP_SSID"] = ssid
@@ -71,7 +70,6 @@ def configure_hostapd(interface: str, ssid: str, country: str, passphrase: str):
 
 def configure_dnsmasq(interface: str, gateway: str):
     """Run 03-configure-dnsmasq.sh"""
-    import os
     env = os.environ.copy()
     env["AP_INTERFACE"] = interface
     env["AP_GATEWAY"] = gateway
@@ -80,7 +78,6 @@ def configure_dnsmasq(interface: str, gateway: str):
 
 def configure_network_manager(interface: str):
     """Run 04-configure-network-manager.sh"""
-    import os
     env = os.environ.copy()
     env["AP_INTERFACE"] = interface
     run_script("04-configure-network-manager.sh", env=env)
@@ -88,7 +85,6 @@ def configure_network_manager(interface: str):
 
 def setup_nat(ap_interface: str, wan_interface: str):
     """Run 05-setup-nat.sh"""
-    import os
     env = os.environ.copy()
     env["AP_INTERFACE"] = ap_interface
     env["WAN_INTERFACE"] = wan_interface
@@ -97,7 +93,6 @@ def setup_nat(ap_interface: str, wan_interface: str):
 
 def setup_service(interface: str, gateway: str):
     """Run 06-setup-service.sh"""
-    import os
     env = os.environ.copy()
     env["AP_INTERFACE"] = interface
     env["AP_GATEWAY"] = gateway
@@ -106,7 +101,6 @@ def setup_service(interface: str, gateway: str):
 
 def enable_services(interface: str):
     """Run 07-enable-services.sh"""
-    import os
     env = os.environ.copy()
     env["AP_INTERFACE"] = interface
     run_script("07-enable-services.sh", env=env)
