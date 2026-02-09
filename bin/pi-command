@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import sys
+import traceback
 from pathlib import Path
 
 # Add cli directory to path
 CLI_DIR = Path(__file__).parent.parent / "cli"
 sys.path.insert(0, str(CLI_DIR))
+
+DEBUG = os.environ.get("DEBUG", "0") == "1"
 
 
 def main():
@@ -68,4 +72,14 @@ Commands:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nAborted.", file=sys.stderr)
+        sys.exit(130)
+    except Exception as e:
+        if DEBUG:
+            traceback.print_exc()
+        else:
+            print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
