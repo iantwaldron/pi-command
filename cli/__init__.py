@@ -1,1 +1,1 @@
-# Pi Command CLI package
+# Pi Bridge CLI package

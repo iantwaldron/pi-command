@@ -112,12 +112,12 @@ def configure_mdns():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Pi Command Setup")
+    parser = argparse.ArgumentParser(description="Pi Bridge Setup")
     parser.add_argument("--use-defaults", action="store_true",
                         help="Use all defaults, read passphrase from stdin")
     args = parser.parse_args()
 
-    logger.info("=== Pi Command Setup ===")
+    logger.info("=== Pi Bridge Setup ===")
 
     if args.use_defaults:
         # Non-interactive mode - use all defaults

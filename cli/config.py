@@ -13,7 +13,7 @@ LOG_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
 LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
-logger = logging.getLogger("pi-command")
+logger = logging.getLogger("pi-bridge")
 
 
 def load_defaults() -> dict[str, str]:

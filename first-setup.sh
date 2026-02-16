@@ -11,10 +11,10 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN_DIR="$SCRIPT_DIR/bin"
 
-echo "Setting up pi-command CLI..."
+echo "Setting up pi-bridge CLI..."
 
 # Make bin scripts executable
-chmod +x "$BIN_DIR/pi-command"
+chmod +x "$BIN_DIR/pi-bridge"
 
 # Detect shell config file
 if [ -n "$ZSH_VERSION" ]; then
@@ -26,21 +26,21 @@ else
 fi
 
 # Check if already added
-if grep -q "pi-command" "$SHELL_RC" 2>/dev/null; then
-    echo "pi-command already in PATH ($SHELL_RC)"
+if grep -q "pi-bridge" "$SHELL_RC" 2>/dev/null; then
+    echo "pi-bridge already in PATH ($SHELL_RC)"
 else
     echo "" >> "$SHELL_RC"
-    echo "# Pi Command CLI" >> "$SHELL_RC"
+    echo "# Pi Bridge CLI" >> "$SHELL_RC"
     echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$SHELL_RC"
-    echo "Added pi-command to PATH in $SHELL_RC"
+    echo "Added pi-bridge to PATH in $SHELL_RC"
 fi
 
 # Source the updated config to apply PATH now
 source "$SHELL_RC"
 
 echo ""
-echo "pi-command is now available."
+echo "pi-bridge is now available."
 echo ""
 echo "Usage:"
-echo "  pi-command setup              # interactive setup"
-echo "  pi-command setup --use-defaults   # use all defaults"
+echo "  pi-bridge setup              # interactive setup"
+echo "  pi-bridge setup --use-defaults   # use all defaults"

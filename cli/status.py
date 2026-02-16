@@ -60,7 +60,7 @@ def get_connected_clients(interface: str) -> int:
 
 
 def main():
-    logger.info("=== Pi Command Status ===\n")
+    logger.info("=== Pi Bridge Status ===\n")
 
     # Services
     logger.info("Services:")

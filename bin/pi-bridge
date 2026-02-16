@@ -14,7 +14,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Pi Command - Raspberry Pi AP management",
+        description="Pi Bridge - Raspberry Pi AP management",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Commands:
@@ -38,7 +38,7 @@ Commands:
     if args.command == "setup":
         from setup import main as setup_main
         # Re-parse with setup's argument parser
-        sys.argv = ["pi-command setup"] + remaining
+        sys.argv = ["pi-bridge setup"] + remaining
         if args.use_defaults:
             sys.argv.append("--use-defaults")
         setup_main()
@@ -62,11 +62,11 @@ Commands:
         clients_main()
     elif args.command == "logs":
         from logs import main as logs_main
-        sys.argv = ["pi-command logs"] + remaining
+        sys.argv = ["pi-bridge logs"] + remaining
         logs_main()
     elif args.command == "forwarding":
         from forwarding import main as forwarding_main
-        sys.argv = ["pi-command forwarding"] + remaining
+        sys.argv = ["pi-bridge forwarding"] + remaining
         forwarding_main()
     elif args.command is None:
         parser.print_help()
