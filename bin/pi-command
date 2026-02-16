@@ -26,6 +26,7 @@ Commands:
   stop          Stop the AP
   clients       List connected clients
   logs          View service logs (hostapd, dnsmasq)
+  forwarding    Manage NAT forwarding interfaces
 """
     )
     parser.add_argument("command", nargs="?", help="Command to run")
@@ -63,6 +64,10 @@ Commands:
         from logs import main as logs_main
         sys.argv = ["pi-command logs"] + remaining
         logs_main()
+    elif args.command == "forwarding":
+        from forwarding import main as forwarding_main
+        sys.argv = ["pi-command forwarding"] + remaining
+        forwarding_main()
     elif args.command is None:
         parser.print_help()
     else:
