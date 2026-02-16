@@ -30,6 +30,9 @@ Interactive setup:
 pi-bridge setup
 ```
 
+On a fresh system, setup installs required packages/firmware first, then exits and asks for a reboot.  
+After reboot, run `pi-bridge setup` again to resume from step 2 automatically.
+
 Non-interactive setup with defaults:
 
 ```bash
