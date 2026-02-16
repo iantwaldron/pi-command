@@ -154,16 +154,38 @@ def reconcile_nat_rules(old_ap: str, new_ap: str, wan: str) -> None:
     run(["sudo", "netfilter-persistent", "save"], check=True, capture=True)
 
 
+def reconcile_wan_change(ap_interface: str, old_wan: str, new_wan: str) -> None:
+    for check_args in nat_rule_checks(ap_interface, old_wan):
+        if iptables_rule_exists(check_args):
+            iptables_rule_del(check_args)
+
+    for check_args in nat_rule_checks(ap_interface, new_wan):
+        if not iptables_rule_exists(check_args):
+            iptables_rule_add(check_args)
+
+    run(["sudo", "netfilter-persistent", "save"], check=True, capture=True)
+
+
 def switch_interface(new_interface: str, wan_interface: str | None = None) -> None:
     if not interface_exists(new_interface):
         raise RuntimeError(f"Interface '{new_interface}' not found")
 
     old_interface = parse_hostapd_interface() or DEFAULTS["DEFAULT_AP_INTERFACE"]
-    if old_interface == new_interface:
-        logger.info(f"AP already configured on {new_interface}.")
+    current_wan = parse_wan_interface()
+    wan = wan_interface or current_wan
+
+    if old_interface == new_interface and current_wan == wan:
+        logger.info(f"AP already configured on {new_interface} with WAN {wan}.")
         return
 
-    wan = wan_interface or parse_wan_interface()
+    if old_interface == new_interface and current_wan != wan:
+        logger.info(f"AP interface unchanged: {new_interface}")
+        logger.info(f"Switching WAN interface: {current_wan} -> {wan}")
+        logger.info("")
+        reconcile_wan_change(new_interface, current_wan, wan)
+        logger.info(f"WAN interface switched to {wan}.")
+        return
+
     gateway = parse_ap_gateway(old_interface)
 
     logger.info(f"Switching AP interface: {old_interface} -> {new_interface}")

@@ -17,3 +17,12 @@ class TestInterfaceCommand:
 
         # Restore default test state for subsequent tests.
         run(["pi-bridge", "interface", "switch", "wlan1", "--wan", "eth0"])
+
+    def test_switch_wan_only(self, run):
+        run(["pi-bridge", "interface", "switch", "wlan1", "--wan", "wlan0"])
+
+        result = run(["pi-bridge", "status"])
+        assert "WAN interface: wlan0" in result.stdout
+
+        # Restore default test state for subsequent tests.
+        run(["pi-bridge", "interface", "switch", "wlan1", "--wan", "eth0"])
