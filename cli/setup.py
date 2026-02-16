@@ -54,6 +54,10 @@ def prompt_yes_no(message: str, default: bool = True) -> bool:
 
 def install_packages(chipset: str):
     """Run 01-install-packages.sh"""
+    if os.environ.get("PI_BRIDGE_SKIP_PACKAGE_INSTALL", "0") == "1":
+        logger.info("Skipping package installation (PI_BRIDGE_SKIP_PACKAGE_INSTALL=1)")
+        return
+
     env = os.environ.copy()
     env["WIFI_CHIPSET"] = chipset
     run_script("01-install-packages.sh", env=env)

@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+import json
+import sys
+from pathlib import Path
+
+STATE_FILE = Path('/tmp/pi-bridge-iptables.json')
+
+
+def load_state() -> dict:
+    if not STATE_FILE.exists():
+        return {'nat': {}, 'filter': {}}
+    return json.loads(STATE_FILE.read_text())
+
+
+def save_state(state: dict) -> None:
+    STATE_FILE.write_text(json.dumps(state))
+
+
+def ensure_chain(state: dict, table: str, chain: str) -> list[str]:
+    table_rules = state.setdefault(table, {})
+    return table_rules.setdefault(chain, [])
+
+
+def parse_args(argv: list[str]) -> tuple[str, str, str | None, list[str]]:
+    table = 'filter'
+    args = argv[:]
+    i = 0
+    while i < len(args):
+        if args[i] == '-t' and i + 1 < len(args):
+            table = args[i + 1]
+            del args[i:i + 2]
+            continue
+        i += 1
+
+    if not args:
+        raise ValueError('missing action')
+
+    action = args[0]
+    chain = args[1] if len(args) > 1 else None
+    spec = args[2:] if len(args) > 2 else []
+    return table, action, chain, spec
+
+
+def format_rule(chain: str, spec: str) -> str:
+    return f'-A {chain} {spec}'.strip()
+
+
+def main() -> int:
+    try:
+        table, action, chain, spec_tokens = parse_args(sys.argv[1:])
+    except ValueError:
+        return 2
+
+    state = load_state()
+    spec = ' '.join(spec_tokens).strip()
+
+    if action == '-S':
+        if chain:
+            rules = ensure_chain(state, table, chain)
+            for rule in rules:
+                print(format_rule(chain, rule))
+        else:
+            for chain_name, rules in state.get(table, {}).items():
+                for rule in rules:
+                    print(format_rule(chain_name, rule))
+        return 0
+
+    if not chain:
+        return 2
+
+    rules = ensure_chain(state, table, chain)
+
+    if action == '-C':
+        return 0 if spec in rules else 1
+
+    if action == '-A':
+        rules.append(spec)
+        save_state(state)
+        return 0
+
+    if action == '-D':
+        if spec not in rules:
+            return 1
+        rules.remove(spec)
+        save_state(state)
+        return 0
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

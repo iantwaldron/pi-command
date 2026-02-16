@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+import os
+import sys
+from pathlib import Path
+
+ACTIVE_FILE = Path('/tmp/pi-bridge-systemctl-active')
+ENABLED_FILE = Path('/tmp/pi-bridge-systemctl-enabled')
+
+
+def canonical(service: str) -> str:
+    return service[:-8] if service.endswith('.service') else service
+
+
+def load(path: Path) -> set[str]:
+    if not path.exists():
+        return set()
+    return {line.strip() for line in path.read_text().splitlines() if line.strip()}
+
+
+def save(path: Path, values: set[str]) -> None:
+    path.write_text(''.join(f"{v}\n" for v in sorted(values)))
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        return 1
+
+    cmd = sys.argv[1]
+    active = load(ACTIVE_FILE)
+    enabled = load(ENABLED_FILE)
+
+    if cmd in ('daemon-reload', 'unmask'):
+        return 0
+
+    if len(sys.argv) < 3:
+        return 1
+
+    service = canonical(sys.argv[2])
+
+    if cmd == 'is-active':
+        is_active = service in active
+        print('active' if is_active else 'inactive')
+        return 0 if is_active else 3
+
+    if cmd == 'is-enabled':
+        is_enabled = service in enabled
+        print('enabled' if is_enabled else 'disabled')
+        return 0 if is_enabled else 1
+
+    if cmd in ('start', 'restart'):
+        active.add(service)
+        save(ACTIVE_FILE, active)
+        return 0
+
+    if cmd == 'stop':
+        active.discard(service)
+        save(ACTIVE_FILE, active)
+        return 0
+
+    if cmd == 'enable':
+        enabled.add(service)
+        save(ENABLED_FILE, enabled)
+        return 0
+
+    if cmd == 'status':
+        state = 'active (running)' if service in active else 'inactive (dead)'
+        print(f'{service}.service - mocked service')
+        print(f'   Active: {state}')
+        return 0
+
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

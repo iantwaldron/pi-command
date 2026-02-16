@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "mocked journalctl output"
+exit 0

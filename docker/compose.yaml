@@ -1,0 +1,16 @@
+services:
+  dev:
+    build: .
+    container_name: pi-bridge-dev
+    volumes:
+      - ..:/opt/pi-bridge:rw
+    working_dir: /opt/pi-bridge
+    stdin_open: true
+    tty: true
+
+  test:
+    build: .
+    volumes:
+      - ..:/opt/pi-bridge:rw
+    working_dir: /opt/pi-bridge
+    command: ["pytest", "tests", "-v"]
